@@ -3,9 +3,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity project_reti_logiche is
-    generic (
-        START_ADDRESS : unsigned(MEM_BITS - 1 downto 0) := (others => '0') -- Indirizzo iniziale di memoria (dove è quindi salvata la maschera d'ingresso).
-    );
     port (
         i_clk      : in  std_logic; -- Clock
         i_start    : in  std_logic; -- Il modulo parte nell'elaborazione quando il segnale START in ingresso viene portato a 1. Il segnale di START rimarrà alto fino a che il segnale di DONE non verrà portato alto.
@@ -19,3 +16,6 @@ entity project_reti_logiche is
     );
 end project_reti_logiche;
 
+architecture Behavioral of project_reti_logiche is
+    type state_type is (IDLE, FETCH_CONST, WAIT_RAM, GET_CONST, FETCH_WZ, GET_WZ, CALC_APP, WRITE_OUT, DONE);
+    
