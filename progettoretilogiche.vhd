@@ -19,3 +19,22 @@ end project_reti_logiche;
 architecture Behavioral of project_reti_logiche is
     type state_type is (IDLE, FETCH_CONST, WAIT_RAM, GET_CONST, FETCH_WZ, GET_WZ, CALC_APP, WRITE_OUT, DONE);
     
+signal STATE, P_STATE : state_type;
+
+begin
+    process(i_clk, i_rst)
+    
+begin
+
+    if(i_rst = '1') then
+        o_en <= '0';
+        o_we <= '0';
+        o_done <= '0';
+        P_STATE <= START;
+        STATE <= START;
+        
+        
+    elseif(rising_edge(i_clk)) then
+        if (i_start = '1' AND i_rst = '0') then
+        
+    
