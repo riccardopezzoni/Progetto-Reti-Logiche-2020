@@ -300,21 +300,31 @@ begin
             when DONE =>
                 o_en <= '0';
                 o_we <= '0';
-                o_done <= '1';
                 STATE <= WAITING;
                 
             when WAITING =>
                 if (i_start = '1') then
-                    STATE <= WAITING;
-                elsif (i_start = '0') then
-                    o_done <= '0';
-                    o_address <= "0000000000001000";
-                    o_en <= '1';                 
-                    P_STATE <= WAITING;
-                    STATE <= START;
-                end if;
-                
-                
+                o_done <= '1';
+                o_address <= "0000000000001000";
+                o_en <= '1';
+                STATE <= WAIT_RAM;
+                P_STATE <= GET_WZ;                
+                elsif (i_start = '0') then     
+                o_en <= '0';
+                o_we <= '0';
+                o_done <= '0';
+                got_WZ0 := false;
+                got_WZ1 := false;
+                got_WZ2 := false;
+                got_WZ3 := false;
+                got_WZ4 := false;
+                got_WZ5 := false;
+                got_WZ6 := false;
+                got_WZ7 := false;
+                address := "0000000000000000";
+                P_STATE <= START;
+                STATE <= START;
+                end if;               
             end case; 
         end if;        
     end process;                 
