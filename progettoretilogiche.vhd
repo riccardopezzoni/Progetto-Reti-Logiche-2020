@@ -58,6 +58,14 @@ begin
     o_en <= '0';
     o_we <= '0';
     o_done <= '0';
+    got_WZ0 := false;
+    got_WZ1 := false;
+    got_WZ2 := false;
+    got_WZ3 := false;
+    got_WZ4 := false;
+    got_WZ5 := false;
+    got_WZ6 := false;
+    got_WZ7 := false;
     address := "0000000000000000";
     P_STATE <= START;
     STATE <= START;
