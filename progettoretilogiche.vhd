@@ -67,6 +67,7 @@ begin
     got_WZ6 := false;
     got_WZ7 := false;
     address := "0000000000000000";
+    appartiene := false;
     P_STATE <= START;
     STATE <= START;
     
@@ -245,6 +246,7 @@ begin
                                                         end if;            
                     elsif(wz5 <= ADDR and ADDR <= endwz5) then
                                 wz_num := "101";
+                                appartiene := true;
                                 if (ADDR - wz5 = "0000") then 
                                     wz_offset := "0001";
                                 elsif (ADDR - wz5 = "0001") then
@@ -298,18 +300,12 @@ begin
                 STATE <= WAIT_RAM;
 
             when DONE =>
+                o_done <= '1';
                 o_en <= '0';
                 o_we <= '0';
                 STATE <= WAITING;
                 
-            when WAITING =>
-                if (i_start = '1') then
-                o_done <= '1';
-                o_address <= "0000000000001000";
-                o_en <= '1';
-                STATE <= WAIT_RAM;
-                P_STATE <= GET_WZ;                
-                elsif (i_start = '0') then     
+            when WAITING =>    
                 o_en <= '0';
                 o_we <= '0';
                 o_done <= '0';
@@ -322,9 +318,9 @@ begin
                 got_WZ6 := false;
                 got_WZ7 := false;
                 address := "0000000000000000";
+                appartiene := false;
                 P_STATE <= START;
                 STATE <= START;
-                end if;               
             end case; 
         end if;        
     end process;                 
