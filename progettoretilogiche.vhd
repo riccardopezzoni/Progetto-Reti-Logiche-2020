@@ -46,8 +46,8 @@ begin
   
     
     variable wz0, wz1, wz2, wz3, wz4, wz5, wz6, wz7, endwz0, endwz1, endwz2, endwz3, endwz4, endwz5, endwz6, endwz7, ADDR : std_logic_vector(7 downto 0);
+    variable lastwz : integer := -1;
     variable address : std_logic_vector(15 downto 0);
-    variable got_WZ0, got_WZ1, got_WZ2, got_WZ3, got_WZ4, got_WZ5, got_WZ6, got_WZ7 : boolean := false;
     variable appartiene : boolean := false;
     variable wz_num : std_logic_vector(2 downto 0);
     variable wz_offset :  std_logic_vector(3 downto 0);
@@ -55,21 +55,15 @@ begin
     
 begin
     if (i_rst = '1') then
-    o_en <= '0';
-    o_we <= '0';
-    o_done <= '0';
-    got_WZ0 := false;
-    got_WZ1 := false;
-    got_WZ2 := false;
-    got_WZ3 := false;
-    got_WZ4 := false;
-    got_WZ5 := false;
-    got_WZ6 := false;
-    got_WZ7 := false;
-    address := "0000000000000000";
-    appartiene := false;
-    P_STATE <= START;
-    STATE <= START;
+        o_en <= '0';
+        o_we <= '0';
+        o_done <= '0';
+        address := "0000000000000000";
+        appartiene := false;
+        lastwz := -1;
+        P_STATE <= START;
+        STATE <= START;
+
     
     elsif (rising_edge(i_clk)) then
     
@@ -77,11 +71,19 @@ begin
         
             when START =>
                 if (i_start = '1' AND  i_rst = '0') then
-                o_address <=  "0000000000000000";
-                o_en <= '1';
-                o_we <= '0';
-                STATE <= WAIT_RAM;
-                P_STATE <= START;
+                    if (lastwz = 7) then
+                        o_address <= "0000000000001000";
+                        o_en <= '1';
+                        o_we <= '0';
+                        STATE <= WAIT_RAM;
+                        P_STATE <= WAITING;
+                    else
+                        o_address <=  "0000000000000000";
+                        o_en <= '1';
+                        o_we <= '0';
+                        STATE <= WAIT_RAM;
+                        P_STATE <= START;
+                    end if;
                 end if;
             
             when WAIT_RAM =>
@@ -90,17 +92,11 @@ begin
                     STATE <= GET_WZ;
                 elsif (P_STATE = GET_WZ) then
                     P_STATE <= WAIT_RAM;
-                    if (got_WZ0 and got_WZ1 and got_WZ2 and got_WZ3 and got_WZ4 and got_WZ5 and got_WZ6 and got_WZ7) then
+                    if (lastwz = 7) then
                         STATE <= GET_ADDR;
                     else 
                         STATE <= GET_WZ;
-                    end if;                  
-                elsif (P_STATE = GET_ADDR) then
-                    P_STATE <= WAIT_RAM;
-                    STATE <= CALC_APP;
-                elsif (P_STATE = CALC_APP) then
-                    P_STATE <= WAIT_RAM;
-                    STATE <= WRITE_OUT;                                    
+                    end if;                                                    
                 elsif (P_STATE = WRITE_OUT) then
                     P_STATE <= WAIT_RAM;
                     STATE <= DONE;
@@ -110,66 +106,66 @@ begin
                 end if;
                             
             when GET_WZ =>
-                if (got_WZ0 = false) then
+                if (lastwz = -1) then
                     wz0 := i_data;
                     endwz0 := i_data + "00000011";
-                    got_WZ0 := true;
+                    lastwz := lastwz + 1;
                     o_address <=  "0000000000000001";
                     o_en <= '1';
                     STATE <= WAIT_RAM;
                     P_STATE <= GET_WZ;
-                elsif (got_WZ1 = false) then
+                elsif (lastwz = 0) then
                     wz1 := i_data;
                     endwz1 := i_data + "00000011";
-                    got_WZ1 := true;
+                    lastwz := lastwz + 1;
                     o_address <=  "0000000000000010";
                     o_en <= '1';
                     STATE <= WAIT_RAM;
                     P_STATE <= GET_WZ;
-                elsif (got_WZ2 = false) then
+                elsif (lastwz = 1) then
                     wz2 := i_data;
                     endwz2 := i_data + "00000011";
-                    got_WZ2 := true;
+                    lastwz := lastwz + 1;
                     o_address <=  "0000000000000011";
                     o_en <= '1';
                     STATE <= WAIT_RAM;
                     P_STATE <= GET_WZ;
-                elsif (got_WZ3 = false) then
+                elsif (lastwz = 2) then
                     wz3 := i_data;
                     endwz3 := i_data + "00000011";
-                    got_WZ3 := true;
+                    lastwz := lastwz + 1;
                     o_address <=  "0000000000000100";
                     o_en <= '1';
                     STATE <= WAIT_RAM;
                     P_STATE <= GET_WZ;
-                elsif (got_WZ4 = false) then
+                elsif (lastwz = 3) then
                     wz4 := i_data;
                     endwz4 := i_data + "00000011";
-                    got_WZ4 := true;
+                    lastwz := lastwz + 1;
                     o_address <=  "0000000000000101";
                     o_en <= '1';
                     STATE <= WAIT_RAM;
                     P_STATE <= GET_WZ;
-                elsif (got_WZ5 = false) then
+                elsif (lastwz = 4) then
                     wz5 := i_data;
                     endwz5 := i_data + "00000011";
-                    got_WZ5 := true;
+                    lastwz := lastwz + 1;
                     o_address <=  "0000000000000110";
                     o_en <= '1';
                     STATE <= WAIT_RAM;
                     P_STATE <= GET_WZ;
-                elsif (got_WZ6 = false) then
+                elsif (lastwz = 5) then
                     wz6 := i_data;
                     endwz6 := i_data + "00000011";
-                    got_WZ6 := true;
+                    lastwz := lastwz + 1;
                     o_address <=  "0000000000000111";
                     o_en <= '1';
                     STATE <= WAIT_RAM;
                     P_STATE <= GET_WZ;    
-                elsif (got_WZ7 = false) then
+                elsif (lastwz = 6) then
                     wz7 := i_data;
                     endwz7 := i_data + "00000011";
-                    got_WZ7 := true;
+                    lastwz := lastwz + 1;
                     o_address <= "0000000000001000";
                     o_en <= '1';
                     STATE <= WAIT_RAM;
@@ -289,8 +285,6 @@ begin
                     o_address <= "0000000000001001";
                     o_data <= '1' & wz_num & wz_offset;
                     o_we <= '1';
-                    P_STATE <= WRITE_OUT;
-                    STATE <= WAITING;
                 elsif (appartiene  = false) then 
                     o_address <= "0000000000001001";
                     o_data <= ADDR;                                 -- sarebbe 0&ADDR ma ADDR è max 127
@@ -309,14 +303,6 @@ begin
                 o_en <= '0';
                 o_we <= '0';
                 o_done <= '0';
-                got_WZ0 := false;
-                got_WZ1 := false;
-                got_WZ2 := false;
-                got_WZ3 := false;
-                got_WZ4 := false;
-                got_WZ5 := false;
-                got_WZ6 := false;
-                got_WZ7 := false;
                 address := "0000000000000000";
                 appartiene := false;
                 P_STATE <= START;
